@@ -364,7 +364,7 @@ struct ViewCopy2<ViewTypeA, ViewTypeB, Layout, ExecSpace, 2, iType> {
   KOKKOS_INLINE_FUNCTION
   void operator()(const iType& i0, const iType& i1) const {
     value_type temp = b(i0, i1);
-    if(temp>-1e-10 && temp <1e-10) 
+    if(temp!=0) 
       a(i0, i1) = static_cast<value_type>(b(i0, i1)); 
   };
 };
