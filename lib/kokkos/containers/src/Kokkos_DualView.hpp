@@ -778,7 +778,7 @@ class DualView : public ViewTraits<DataType, Arg1Type, Arg2Type, Arg3Type> {
     }
     if (modified_flags(1) >= modified_flags(0)) {
       /* Resize on Device */
-      ::Kokkos::resize(d_view, n0, n1, n2, n3, n4, n5, n6, n7);
+      ::Kokkos::resize2(d_view, n0, n1, n2, n3, n4, n5, n6, n7);
       h_view = create_mirror_view(d_view);
 
       /* Mark Device copy as modified */

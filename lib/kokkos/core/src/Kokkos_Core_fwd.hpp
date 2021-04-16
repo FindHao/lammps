@@ -255,6 +255,9 @@ struct ViewFill;
 template <class ViewTypeA, class ViewTypeB, class Layout, class ExecSpace,
           int Rank, typename iType>
 struct ViewCopy;
+template <class ViewTypeA, class ViewTypeB, class Layout, class ExecSpace,
+          int Rank, typename iType>
+struct ViewCopy2;
 
 template <class Functor, class Policy, class EnableFunctor = void,
           class EnablePolicy = void>

@@ -41,10 +41,10 @@ cpp_files=""
 xcompiler_args=""
 
 # Cuda (NVCC) only arguments
-cuda_args=""
+cuda_args="-lineinfo"
 
 # Arguments for both NVCC and Host compiler
-shared_args=""
+shared_args="-g"
 
 # Argument -c
 compile_arg=""
