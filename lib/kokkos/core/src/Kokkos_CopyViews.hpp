@@ -848,7 +848,7 @@ void view_copy2(const DstType& dst, const SrcType& src) {
             Kokkos::LayoutLeft, src_execution_space, DstType::Rank, int64_t>(
             dst, src);
     }
-  } else {
+  } else {  
     if (DstExecCanAccessSrc) {
       if (iterate == Kokkos::Iterate::Right)
         Kokkos::Impl::ViewCopy2<
@@ -1052,7 +1052,7 @@ struct ViewRemap<DstType, SrcType, ExecSpace, 2> {
         using sv_adapter_type =
             CommonSubview<DstType, SrcType, 2, p_type, Kokkos::Impl::ALL_t>;
         sv_adapter_type common_subview(dst, src, ext0, Kokkos::ALL);
-        view_copy2(common_subview.dst_sub, common_subview.src_sub);
+        view_copy(common_subview.dst_sub, common_subview.src_sub);
       } else {
         p_type ext0(0, std::min(dst.extent(0), src.extent(0)));
         p_type ext1(0, std::min(dst.extent(1), src.extent(1)));
@@ -1086,7 +1086,7 @@ struct ViewRemap2<DstType, SrcType, ExecSpace, 2> {
         using sv_adapter_type =
             CommonSubview<DstType, SrcType, 2, p_type, Kokkos::Impl::ALL_t>;
         sv_adapter_type common_subview(dst, src, ext0, Kokkos::ALL);
-        view_copy(common_subview.dst_sub, common_subview.src_sub);
+        view_copy2(common_subview.dst_sub, common_subview.src_sub);
       } else {
         p_type ext0(0, std::min(dst.extent(0), src.extent(0)));
         p_type ext1(0, std::min(dst.extent(1), src.extent(1)));
