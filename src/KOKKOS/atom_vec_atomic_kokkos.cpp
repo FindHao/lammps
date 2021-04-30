@@ -81,6 +81,37 @@ void AtomVecAtomicKokkos::grow(int n)
       modify->fix[atom->extra_grow[iextra]]->grow_arrays(nmax);
 }
 
+
+void AtomVecAtomicKokkos::grow_cache(int n, float rate)
+{
+  auto DELTA = LMP_KOKKOS_AV_DELTA;
+  int step = MAX(DELTA,nmax*rate);
+  if (n == 0) nmax += step;
+  else nmax = n;
+  atomKK->nmax = nmax;
+  if (nmax < 0 || nmax > MAXSMALLINT)
+    error->one(FLERR,"Per-processor system is too big");
+
+  atomKK->sync(Device,ALL_MASK);
+  atomKK->modified(Device,ALL_MASK);
+
+  memoryKK->grow_kokkos(atomKK->k_tag,atomKK->tag,nmax,"atom:tag");
+  memoryKK->grow_kokkos(atomKK->k_type,atomKK->type,nmax,"atom:type");
+  memoryKK->grow_kokkos(atomKK->k_mask,atomKK->mask,nmax,"atom:mask");
+  memoryKK->grow_kokkos(atomKK->k_image,atomKK->image,nmax,"atom:image");
+
+  memoryKK->grow_kokkos(atomKK->k_x,atomKK->x,nmax,"atom:x");
+  memoryKK->grow_kokkos(atomKK->k_v,atomKK->v,nmax,"atom:v");
+  memoryKK->grow_kokkos(atomKK->k_f,atomKK->f,nmax,"atom:f");
+
+  grow_pointers();
+  atomKK->sync(Host,ALL_MASK);
+
+  if (atom->nextra_grow)
+    for (int iextra = 0; iextra < atom->nextra_grow; iextra++)
+      modify->fix[atom->extra_grow[iextra]]->grow_arrays(nmax);
+}
+
 /* ----------------------------------------------------------------------
    reset local array ptrs
 ------------------------------------------------------------------------- */
@@ -394,7 +425,7 @@ struct AtomVecAtomicKokkos_UnpackBorder {
 void AtomVecAtomicKokkos::unpack_border_kokkos(const int &n, const int &first,
                      const DAT::tdual_xfloat_2d &buf,ExecutionSpace space) {
   atomKK->modified(space,X_MASK|TAG_MASK|TYPE_MASK|MASK_MASK);
-  while (first+n >= nmax) grow(0);
+  while (first+n >= nmax) grow_cache(0, 0.8);
   atomKK->modified(space,X_MASK|TAG_MASK|TYPE_MASK|MASK_MASK);
   if (space==Host) {
     struct AtomVecAtomicKokkos_UnpackBorder<LMPHostType> f(buf.view<LMPHostType>(),h_x,h_tag,h_type,h_mask,first);
@@ -795,7 +826,7 @@ void AtomVecAtomicKokkos::create_atom(int itype, double *coord)
   if (nlocal == nmax) {
     //if(nlocal>2) printf("typeA: %i %i\n",type[0],type[1]);
     atomKK->modified(Host,ALL_MASK);
-    grow(0);
+    grow_cache(0, 0.1);
     //if(nlocal>2) printf("typeB: %i %i\n",type[0],type[1]);
   }
   atomKK->modified(Host,ALL_MASK);
